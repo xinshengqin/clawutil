@@ -109,6 +109,11 @@ else ifeq ($(CLAW_FC),pgfortran)
 	MODULE_FLAG = -module 
 	ALL_FFLAGS += -gopt -fast -Mpreprocess
 	OMP_FLAG = -mp -Minfo=mp
+else ifeq ($(CLAW_FC),ftn)
+	# Note that there shoud be a space after this flag
+	MODULE_FLAG = -module 
+	ALL_FFLAGS += -gopt -fast -Mpreprocess
+	OMP_FLAG = -mp -Minfo=mp
 else
 	# Assume gcc like flagging, probably should raise an error here
 	MODULE_FLAG = -J
