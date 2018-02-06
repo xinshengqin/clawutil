@@ -107,7 +107,7 @@ else ifeq ($(CLAW_FC),ifort)
 else ifeq ($(CLAW_FC),pgfortran)
 	# Note that there shoud be a space after this flag
 	MODULE_FLAG = -module 
-	ALL_FFLAGS += -gopt -fast -Mpreprocess
+	ALL_FFLAGS += -gopt -fast -Mpreprocess -mp -Minfo=mp
 	OMP_FLAG = -mp -Minfo=mp
 else ifeq ($(CLAW_FC),ftn)
 	# Note that there shoud be a space after this flag
