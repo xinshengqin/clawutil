@@ -84,6 +84,7 @@ PPFLAGS ?=
 ALL_INCLUDE ?=
 ALL_FFLAGS ?=
 ALL_LFLAGS ?=
+ALL_DEFINES ?=
 
 # Add includes, the module search paths and library search paths are appended
 # at the end of the ALL_INCLUDE variable so that INCLUDE can override any of
@@ -99,25 +100,45 @@ ALL_LFLAGS += $(LFLAGS)
 ifeq ($(CLAW_FC),gfortran)
 	# There should be no space between this flag and the argument
 	MODULE_FLAG = -J
-	OMP_FLAG = -fopenmp
+	ALL_FFLAGS += -O3
+        ifeq ($(USE_OPENMP),TRUE)
+	 	ALL_FFLAGS += -fopenmp
+		ALL_LFLAGS += -lgomp
+        endif
 else ifeq ($(CLAW_FC),ifort)
 	# Note that there shoud be a space after this flag
 	MODULE_FLAG = -module 
-	OMP_FLAG = -openmp
+	ALL_FFLAGS += -O3
+	ifeq ($(USE_OPENMP),TRUE)
+	 	ALL_FFLAGS += -fopenmp
+	endif
 else ifeq ($(CLAW_FC),pgfortran)
 	# Note that there shoud be a space after this flag
 	MODULE_FLAG = -module 
-	ALL_FFLAGS += -gopt -fast -Mpreprocess -mp -Minfo=mp
-	OMP_FLAG = -mp -Minfo=mp
+	ALL_FFLAGS += -gopt -O4 -fast -Mpreprocess
+	ifeq ($(USE_OPENMP),TRUE)
+	 	ALL_FFLAGS += -mp -Minfo=mp
+	endif
 else ifeq ($(CLAW_FC),ftn)
 	# Note that there shoud be a space after this flag
 	MODULE_FLAG = -module 
-	ALL_FFLAGS += -gopt -fast -Mpreprocess -mp -Minfo=mp -i8
-	OMP_FLAG = -mp -Minfo=mp
+	ALL_FFLAGS += -gopt -O4 -fast -Mpreprocess -mp -Minfo=mp -i8
+	ifeq ($(USE_OPENMP),TRUE)
+	 	ALL_FFLAGS += -mp -Minfo=mp
+	endif
 else
 	# Assume gcc like flagging, probably should raise an error here
 	MODULE_FLAG = -J
-	OMP_FLAG = -fopenmp
+	ifeq ($(USE_OPENMP),TRUE)
+	 	ALL_FFLAGS += -fopenmp
+	endif
+endif
+
+# -----------------------------------------------------------------------------
+ifeq ($(USE_DOUBLE_PRECISION),TRUE)
+    ALL_DEFINES += -DCLAW_REAL=8
+else
+    ALL_DEFINES += -DCLAW_REAL=4
 endif
 
 # We may want to set MAKELEVEL here as it is not always set but we know we are
@@ -134,11 +155,11 @@ endif
 
 # Default Rules, the module rule should be executed first in most instances,
 # this way the .mod file ends up always in the correct spot
-%.mod : %.f90 ; touch $@; $(CLAW_FC) -c -cpp $< $(MODULE_FLAG)$(@D) $(ALL_INCLUDE) $(ALL_FFLAGS) -o $*.o
-%.mod : %.f   ; touch $@; $(CLAW_FC) -c -cpp $< $(MODULE_FLAG)$(@D) $(ALL_INCLUDE) $(ALL_FFLAGS) -o $*.o
+%.mod : %.f90 ; touch $@; $(CLAW_FC) -c -cpp $< $(MODULE_FLAG)$(@D) $(ALL_INCLUDE) $(ALL_FFLAGS) $(ALL_DEFINES) -o $*.o
+%.mod : %.f   ; touch $@; $(CLAW_FC) -c -cpp $< $(MODULE_FLAG)$(@D) $(ALL_INCLUDE) $(ALL_FFLAGS) $(ALL_DEFINES) -o $*.o
 
-%.o : %.f90 ;             $(CLAW_FC) -c -cpp $< 					$(ALL_INCLUDE) $(ALL_FFLAGS) -o $@
-%.o : %.f ;               $(CLAW_FC) -c -cpp $< 					$(ALL_INCLUDE) $(ALL_FFLAGS) -o $@
+%.o : %.f90 ;             $(CLAW_FC) -c -cpp $< 					$(ALL_INCLUDE) $(ALL_FFLAGS) $(ALL_DEFINES) -o $@
+%.o : %.f ;               $(CLAW_FC) -c -cpp $< 					$(ALL_INCLUDE) $(ALL_FFLAGS) $(ALL_DEFINES) -o $@
 
 #----------------------------------------------------------------------------
 # Executable:
@@ -147,7 +168,7 @@ endif
 
 # The order here is to again build the module files correctly
 $(EXE): $(MODULE_FILES) $(MODULE_OBJECTS) $(OBJECTS) $(MAKEFILE_LIST) ;
-	$(LINK) $(MODULE_OBJECTS) $(OBJECTS) $(ALL_INCLUDE) $(ALL_LFLAGS) -o $(EXE)
+	$(LINK) $(MODULE_OBJECTS) $(OBJECTS) $(ALL_INCLUDE) $(ALL_LFLAGS) $(ALL_DEFINES) -o $(EXE)
 
 .exe: $(EXE)
 
@@ -308,4 +329,17 @@ help:
 	@echo '   "make help"     to print this message'
 
 .help: help
+#-----------------------------------------------------------------------------
+# for debugging.  To see the value of a Makefile variable,
+# e.g. libraries, simply do "make print-libraries".  This will
+# print out the value:
+# its value
+# how it was defined, e.g. from environment or file
+# the flavor of the variable, either simple or recursive
+# the unexpanded value of the variable
+print-%:
+	@echo $* is '$($*)'
+	@echo '  origin = $(origin $*)'
+	@echo '  flavor = $(flavor $*)'
+	@echo '   value = $(value  $*)'
 
