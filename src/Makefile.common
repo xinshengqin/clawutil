@@ -115,14 +115,16 @@ else ifeq ($(CLAW_FC),ifort)
 else ifeq ($(CLAW_FC),pgfortran)
 	# Note that there shoud be a space after this flag
 	MODULE_FLAG = -module 
-	ALL_FFLAGS += -gopt -O4 -fast -Mpreprocess
+	ALL_FFLAGS += -O4 -fast -Mpreprocess
+	ALL_LFLAGS += -O4 -fast
 	ifeq ($(USE_OPENMP),TRUE)
 	 	ALL_FFLAGS += -mp -Minfo=mp
 	endif
-else ifeq ($(CLAW_FC),ftn)
+else ifeq ($(CLAW_FC),ftn) # The compiler on Titan is invoked with ftn
 	# Note that there shoud be a space after this flag
 	MODULE_FLAG = -module 
-	ALL_FFLAGS += -gopt -O4 -fast -Mpreprocess -mp -Minfo=mp -i8
+	ALL_FFLAGS += -O4 -fast -Mpreprocess -mp -Minfo=mp -i8
+	ALL_LFLAGS += -O4 -fast
 	ifeq ($(USE_OPENMP),TRUE)
 	 	ALL_FFLAGS += -mp -Minfo=mp
 	endif
