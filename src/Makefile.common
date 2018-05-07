@@ -121,12 +121,14 @@ else ifeq ($(CLAW_FC),pgfortran)
 	 	ALL_FFLAGS += -mp -Minfo=mp
 	endif
 else ifeq ($(CLAW_FC),ftn) # The compiler on Titan is invoked with ftn
+    	# assume ftn is pgi compiler
 	# Note that there shoud be a space after this flag
 	MODULE_FLAG = -module 
-	ALL_FFLAGS += -O4 -fast -Mpreprocess -mp -Minfo=mp -i8
-	ALL_LFLAGS += -O4 -fast
+	ALL_FFLAGS += -O4 -fast -Mpreprocess -i8
+	ALL_LFLAGS += -O4 -fast -Mpreprocess -i8
 	ifeq ($(USE_OPENMP),TRUE)
 	 	ALL_FFLAGS += -mp -Minfo=mp
+	 	ALL_LFLAGS += -mp -Minfo=mp
 	endif
 else
 	# Assume gcc like flagging, probably should raise an error here
