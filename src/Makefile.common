@@ -101,6 +101,7 @@ ifeq ($(CLAW_FC),gfortran)
 	# There should be no space between this flag and the argument
 	MODULE_FLAG = -J
 	ALL_FFLAGS += -O3
+	# ALL_FFLAGS += -g -fbacktrace -ggdb
         ifeq ($(USE_OPENMP),TRUE)
 	 	ALL_FFLAGS += -fopenmp
 		ALL_LFLAGS += -lgomp
