@@ -140,10 +140,10 @@ else
 endif
 
 # -----------------------------------------------------------------------------
-ifeq ($(USE_DOUBLE_PRECISION),TRUE)
-    ALL_DEFINES += -DCLAW_REAL=8
-else
+ifeq ($(USE_DOUBLE_PRECISION),FALSE)
     ALL_DEFINES += -DCLAW_REAL=4
+else
+    ALL_DEFINES += -DCLAW_REAL=8
 endif
 
 # We may want to set MAKELEVEL here as it is not always set but we know we are
