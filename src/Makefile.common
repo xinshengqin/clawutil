@@ -125,8 +125,8 @@ else ifeq ($(CLAW_FC),ftn) # The compiler on Titan is invoked with ftn
     	# assume ftn is pgi compiler
 	# Note that there shoud be a space after this flag
 	MODULE_FLAG = -module 
-	ALL_FFLAGS += -O4 -fast -Mpreprocess -i8
-	ALL_LFLAGS += -O4 -fast -Mpreprocess -i8
+	ALL_FFLAGS += -O4 -fast -Mpreprocess
+	ALL_LFLAGS += -O4 -fast -Mpreprocess
 	ifeq ($(USE_OPENMP),TRUE)
 	 	ALL_FFLAGS += -mp -Minfo=mp
 	 	ALL_LFLAGS += -mp -Minfo=mp
